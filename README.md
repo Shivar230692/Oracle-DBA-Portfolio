@@ -1,9 +1,9 @@
-# Oracle DBA Portfolio
+# Oracle DBA Portfolio #
 
 Welcome to my Oracle Database Administration portfolio.
 
-This repository demonstrates my experience and knowledge in Oracle Database Administration, 
-SQL, backup and recovery, performance tuning, database monitoring (OEM and Splunk), security, troubleshooting,
+This repository demonstrates my experience and knowledge in Oracle Database Administration 11g, 12c, and 19c standalone and RAC.
+SQL, backup and recovery, performance tuning, database monitoring (OEM and Splunk), security, troubleshooting, patching, OS, 
 and automation. Used ServiceNow as a ticketing tool.
 
 ## About Me
@@ -85,6 +85,17 @@ Examples demonstrating:
 - Object privileges
 - Profiles
 - Password policies
+
+### Quarterly Patching
+
+- Database
+- Grid
+- Troubleshooting patching issues
+
+### Operating System
+
+- CPU, memory utilization
+- Validating cluster processes
 
 ## Contact
 LinkedIn - www.linkedin.com/in/shivam-varshney-7b6b84a4
