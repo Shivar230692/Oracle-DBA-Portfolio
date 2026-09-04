@@ -86,13 +86,13 @@ Examples demonstrating:
 - Profiles
 - Password policies
 
-### Quarterly Patching
+### 6. Quarterly Patching
 
 - Database
 - Grid
 - Troubleshooting patching issues
 
-### Operating System
+### 7. Operating System
 
 - CPU, memory utilization
 - Validating cluster processes
