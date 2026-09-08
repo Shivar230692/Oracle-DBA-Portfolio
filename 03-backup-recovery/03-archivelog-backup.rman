@@ -1,0 +1,148 @@
+# ============================================================
+# Oracle DBA Portfolio
+# Project: Backup & Recovery with RMAN
+# File: 03-archivelog-backup.rman
+# Purpose: Demonstrate archived redo log backup operations
+# ============================================================
+
+# ============================================================
+# NOTE
+# These commands are examples for a laboratory or authorized
+# Oracle environment.
+#
+# Replace /backup/oracle/ with an approved backup destination.
+# ============================================================
+
+
+# ============================================================
+# 1. Display Current Database Archive Log Mode
+# ============================================================
+
+# Run from SQL*Plus, SQLcl or another Oracle SQL client:
+#
+# SELECT name, log_mode
+# FROM v$database;
+
+
+# ============================================================
+# 2. Display Archived Redo Logs
+# ============================================================
+
+# Run from SQL*Plus or SQLcl:
+
+SELECT
+    thread#,
+    sequence#,
+    first_time,
+    next_time,
+    archived,
+    deleted,
+    status
+FROM v$archived_log
+ORDER BY thread#, sequence#;
+
+
+# ============================================================
+# 3. Back Up All Archived Redo Logs
+# ============================================================
+
+BACKUP ARCHIVELOG ALL
+FORMAT '/backup/oracle/arch_%U.bkp';
+
+
+# ============================================================
+# 4. Back Up Archived Logs and Delete Input
+# ============================================================
+
+# DELETE INPUT removes archived log files from their original
+# location after RMAN successfully backs them up.
+
+BACKUP ARCHIVELOG ALL
+FORMAT '/backup/oracle/arch_delete_%U.bkp'
+DELETE INPUT;
+
+
+# ============================================================
+# 5. Back Up Archived Logs Generated Since a Specific Time
+# ============================================================
+
+# Example:
+#
+# BACKUP ARCHIVELOG
+# FROM TIME 'SYSDATE-1'
+# FORMAT '/backup/oracle/arch_1day_%U.bkp';
+
+
+# ============================================================
+# 6. Back Up Archived Logs Until a Specific Sequence
+# ============================================================
+
+# Example:
+#
+# BACKUP ARCHIVELOG
+# UNTIL SEQUENCE 100
+# FORMAT '/backup/oracle/arch_until_%U.bkp';
+
+
+# ============================================================
+# 7. Validate Archived Redo Log Backups
+# ============================================================
+
+# RMAN can validate the ability to restore archived logs.
+
+RESTORE ARCHIVELOG ALL VALIDATE;
+
+
+# ============================================================
+# 8. List Archived Log Backups
+# ============================================================
+
+LIST BACKUP OF ARCHIVELOG ALL;
+
+
+# ============================================================
+# 9. Crosscheck Archived Log Backups
+# ============================================================
+
+CROSSCHECK BACKUP OF ARCHIVELOG ALL;
+
+
+# ============================================================
+# 10. Delete Expired Backup Records
+# ============================================================
+
+# After CROSSCHECK identifies missing backup pieces, expired
+# records can be removed from the RMAN repository.
+
+DELETE EXPIRED BACKUP;
+
+
+# ============================================================
+# 11. Archived Redo Log Monitoring Query
+# ============================================================
+
+SELECT
+    thread#,
+    sequence#,
+    first_time,
+    next_time,
+    archived,
+    deleted,
+    status
+FROM v$archived_log
+ORDER BY first_time DESC;
+
+
+# ============================================================
+# 12. DBA Operational Checklist
+# ============================================================
+
+# [ ] ARCHIVELOG mode confirmed
+# [ ] Archived redo logs backed up
+# [ ] Backup destination has sufficient space
+# [ ] Backup jobs monitored
+# [ ] Archived log backups validated
+# [ ] RMAN repository crosschecked
+# [ ] Expired backup records reviewed
+# [ ] Restore testing performed
+# [ ] Recovery procedures documented

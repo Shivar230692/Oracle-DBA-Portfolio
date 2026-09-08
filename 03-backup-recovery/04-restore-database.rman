@@ -1,0 +1,185 @@
+# ============================================================
+# Oracle DBA Portfolio
+# Project: Backup & Recovery with RMAN
+# File: 04-restore-database.rman
+# Purpose: Demonstrate Oracle database restore operations
+# ============================================================
+
+# ============================================================
+# IMPORTANT
+# These commands are examples for a laboratory or authorized
+# recovery environment.
+#
+# Do NOT execute restore/recovery commands against production
+# without an approved recovery procedure.
+# ============================================================
+
+
+# ============================================================
+# 1. Check Available Backups
+# ============================================================
+
+LIST BACKUP SUMMARY;
+
+LIST BACKUP OF DATABASE;
+
+LIST BACKUP OF ARCHIVELOG ALL;
+
+
+# ============================================================
+# 2. Validate Database Restore
+# ============================================================
+
+# Validate that RMAN can locate the required backup files
+# without actually restoring the database.
+
+RESTORE DATABASE VALIDATE;
+
+
+# ============================================================
+# 3. Complete Database Restore and Recovery
+# ============================================================
+
+# Start the database in MOUNT mode before restoring the
+# complete database.
+
+STARTUP MOUNT;
+
+RESTORE DATABASE;
+
+RECOVER DATABASE;
+
+
+# ============================================================
+# 4. Open the Database After Complete Recovery
+# ============================================================
+
+# After successful complete recovery:
+
+ALTER DATABASE OPEN;
+
+
+# ============================================================
+# 5. Restore a Specific Datafile
+# ============================================================
+
+# Example:
+#
+# SQL:
+# ALTER DATABASE DATAFILE '/u01/oradata/ORCL/users01.dbf'
+# OFFLINE;
+#
+# RMAN:
+#
+# RESTORE DATAFILE '/u01/oradata/ORCL/users01.dbf';
+#
+# RECOVER DATAFILE '/u01/oradata/ORCL/users01.dbf';
+#
+# SQL:
+#
+# ALTER DATABASE DATAFILE '/u01/oradata/ORCL/users01.dbf'
+# ONLINE;
+
+
+# ============================================================
+# 6. Restore Database to an Alternate Location
+# ============================================================
+
+# Example:
+#
+# SET NEWNAME FOR DATAFILE 1
+# TO '/u02/oradata/ORCL/system01.dbf';
+#
+# RESTORE DATAFILE 1;
+#
+# SWITCH DATAFILE ALL;
+#
+# RECOVER DATABASE;
+
+
+# ============================================================
+# 7. Restore Control File
+# ============================================================
+
+# Example:
+#
+# STARTUP NOMOUNT;
+#
+# RESTORE CONTROLFILE FROM AUTOBACKUP;
+#
+# ALTER DATABASE MOUNT;
+#
+# CATALOG START WITH '/backup/oracle/';
+#
+# RESTORE DATABASE;
+#
+# RECOVER DATABASE;
+
+
+# ============================================================
+# 8. Restore SPFILE
+# ============================================================
+
+# Example:
+#
+# STARTUP FORCE NOMOUNT;
+#
+# RESTORE SPFILE FROM AUTOBACKUP;
+
+
+# ============================================================
+# 9. Crosscheck Backup Files
+# ============================================================
+
+CROSSCHECK BACKUP;
+
+
+# ============================================================
+# 10. List Expired Backups
+# ============================================================
+
+LIST EXPIRED BACKUP;
+
+
+# ============================================================
+# 11. Recovery Verification
+# ============================================================
+
+# After recovery, verify that the database is open and that
+# the database role and open mode are correct.
+
+# Run from SQL*Plus or SQLcl:
+#
+# SELECT
+#     name,
+#     database_role,
+#     open_mode
+# FROM v$database;
+
+
+# ============================================================
+# 12. Restore & Recovery Workflow
+# ============================================================
+
+# Failure
+#    |
+#    v
+# Assess database state
+#    |
+#    v
+# Identify required backup
+#    |
+#    v
+# Restore database files
+#    |
+#    v
+# Recover using redo
+#    |
+#    v
+# Validate recovery
+#    |
+#    v
+# Open database
+#    |
+#    v
+# Verify application availability

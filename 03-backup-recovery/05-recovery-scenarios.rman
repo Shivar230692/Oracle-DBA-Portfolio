@@ -1,0 +1,278 @@
+# ============================================================
+# Oracle DBA Portfolio
+# Project: Backup & Recovery with RMAN
+# File: 05-recovery-scenarios.rman
+# Purpose: Demonstrate common Oracle recovery scenarios
+# ============================================================
+
+# ============================================================
+# IMPORTANT
+# These examples are for a laboratory or authorized recovery
+# environment.
+#
+# Recovery procedures must be adapted to the actual database,
+# backup strategy and failure scenario.
+# ============================================================
+
+
+# ============================================================
+# 1. COMPLETE DATABASE RECOVERY
+# ============================================================
+
+# Complete recovery attempts to recover the database to the
+# latest possible consistent point using available backups
+# and redo.
+
+STARTUP MOUNT;
+
+RESTORE DATABASE;
+
+RECOVER DATABASE;
+
+ALTER DATABASE OPEN;
+
+
+# ============================================================
+# 2. DATAFILE RECOVERY
+# ============================================================
+
+# Example scenario:
+# A datafile has been lost or corrupted.
+
+# First identify the affected datafile.
+
+# Run from SQL*Plus or SQLcl:
+#
+# SELECT
+#     file#,
+#     name,
+#     status,
+#     enabled
+# FROM v$datafile
+# ORDER BY file#;
+
+
+# RMAN example:
+#
+# RESTORE DATAFILE 4;
+#
+# RECOVER DATAFILE 4;
+
+
+# ============================================================
+# 3. TABLESPACE RECOVERY
+# ============================================================
+
+# Example:
+# Restore and recover a damaged tablespace.
+
+# RMAN example:
+#
+# SQL 'ALTER TABLESPACE USERS OFFLINE IMMEDIATE';
+#
+# RESTORE TABLESPACE USERS;
+#
+# RECOVER TABLESPACE USERS;
+#
+# SQL 'ALTER TABLESPACE USERS ONLINE';
+
+
+# ============================================================
+# 4. CONTROL FILE RECOVERY
+# ============================================================
+
+# The control file contains important database structure and
+# recovery metadata.
+
+STARTUP NOMOUNT;
+
+RESTORE CONTROLFILE FROM AUTOBACKUP;
+
+ALTER DATABASE MOUNT;
+
+# If required, catalog the backup location:
+#
+# CATALOG START WITH '/backup/oracle/';
+
+RESTORE DATABASE;
+
+RECOVER DATABASE;
+
+
+# ============================================================
+# 5. SPFILE RECOVERY
+# ============================================================
+
+# Restore the server parameter file from an RMAN backup.
+
+STARTUP FORCE NOMOUNT;
+
+RESTORE SPFILE FROM AUTOBACKUP;
+
+
+# ============================================================
+# 6. POINT-IN-TIME RECOVERY
+# ============================================================
+
+# Point-in-time recovery, also called incomplete recovery,
+# recovers the database to a specified time.
+
+# Example:
+#
+# STARTUP MOUNT;
+#
+# RESTORE DATABASE;
+#
+# SET UNTIL TIME "TO_DATE('2026-09-08 08:00:00',
+#                         'YYYY-MM-DD HH24:MI:SS')";
+#
+# RECOVER DATABASE;
+#
+# ALTER DATABASE OPEN RESETLOGS;
+
+
+# ============================================================
+# 7. SCN-BASED RECOVERY
+# ============================================================
+
+# A database can also be recovered to a specific System
+# Change Number (SCN).
+
+# Example:
+#
+# STARTUP MOUNT;
+#
+# SET UNTIL SCN 123456789;
+#
+# RESTORE DATABASE;
+#
+# RECOVER DATABASE;
+#
+# ALTER DATABASE OPEN RESETLOGS;
+
+
+# ============================================================
+# 8. SEQUENCE-BASED RECOVERY
+# ============================================================
+
+# Recovery can also be stopped at a selected redo log
+# sequence.
+
+# Example:
+#
+# STARTUP MOUNT;
+#
+# SET UNTIL SEQUENCE 500 THREAD 1;
+#
+# RESTORE DATABASE;
+#
+# RECOVER DATABASE;
+#
+# ALTER DATABASE OPEN RESETLOGS;
+
+
+# ============================================================
+# 9. VALIDATE RECOVERY REQUIREMENTS
+# ============================================================
+
+# Before performing a recovery operation, identify the
+# backups available to RMAN.
+
+LIST BACKUP SUMMARY;
+
+LIST BACKUP OF DATABASE;
+
+LIST BACKUP OF ARCHIVELOG ALL;
+
+
+# Validate whether the database can be restored.
+
+RESTORE DATABASE VALIDATE;
+
+
+# ============================================================
+# 10. CROSSCHECK BACKUPS
+# ============================================================
+
+# Crosscheck compares RMAN repository information with the
+# physical availability of backup files.
+
+CROSSCHECK BACKUP;
+
+
+# ============================================================
+# 11. IDENTIFY EXPIRED BACKUPS
+# ============================================================
+
+LIST EXPIRED BACKUP;
+
+
+# ============================================================
+# 12. RECOVERY DECISION WORKFLOW
+# ============================================================
+
+# Identify failure
+#       |
+#       v
+# Determine affected files
+#       |
+#       v
+# Check database state
+#       |
+#       v
+# Determine RPO / recovery target
+#       |
+#       v
+# Identify required backups
+#       |
+#       v
+# Restore files
+#       |
+#       v
+# Apply redo
+#       |
+#       v
+# Validate recovery
+#       |
+#       v
+# Open database
+#       |
+#       v
+# Verify application availability
+
+
+# ============================================================
+# 13. POST-RECOVERY CHECKLIST
+# ============================================================
+
+# [ ] Database open mode verified
+# [ ] Database role verified
+# [ ] Datafiles verified
+# [ ] Tablespaces verified
+# [ ] Archived redo logs reviewed
+# [ ] Application connectivity tested
+# [ ] Invalid objects reviewed
+# [ ] Alert log reviewed
+# [ ] Backup strategy reviewed
+# [ ] Recovery incident documented
+
+
+# ============================================================
+# 14. DBA RECOVERY PRINCIPLES
+# ============================================================
+
+# 1. Do not immediately overwrite evidence during an incident.
+#
+# 2. Identify the failure before selecting a recovery method.
+#
+# 3. Confirm the recovery objective.
+#
+# 4. Verify that required backups and archived redo logs exist.
+#
+# 5. Validate backups whenever possible.
+#
+# 6. Perform recovery in an authorized environment.
+#
+# 7. Verify database and application health after recovery.
+#
+# 8. Document the recovery procedure and lessons learned.

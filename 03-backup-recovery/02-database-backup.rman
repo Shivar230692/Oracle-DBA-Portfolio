@@ -1,0 +1,120 @@
+# ============================================================
+# Oracle DBA Portfolio
+# Project: Backup & Recovery with RMAN
+# File: 02-database-backup.rman
+# Purpose: Demonstrate Oracle database backup operations
+# ============================================================
+
+# ============================================================
+# NOTE
+# These commands are examples for a laboratory or authorized
+# Oracle environment.
+#
+# Replace /backup/oracle/ with an approved backup destination.
+# ============================================================
+
+
+# ============================================================
+# 1. Display RMAN Configuration
+# ============================================================
+
+SHOW ALL;
+
+
+# ============================================================
+# 2. Full Database Backup
+# ============================================================
+
+BACKUP DATABASE
+FORMAT '/backup/oracle/full_%U.bkp';
+
+
+# ============================================================
+# 3. Full Database Backup Including Archived Redo Logs
+# ============================================================
+
+BACKUP DATABASE PLUS ARCHIVELOG
+FORMAT '/backup/oracle/full_arch_%U.bkp';
+
+
+# ============================================================
+# 4. Level 0 Incremental Backup
+# ============================================================
+
+# A level 0 incremental backup contains the baseline required
+# for subsequent incremental backup strategies.
+
+BACKUP INCREMENTAL LEVEL 0 DATABASE
+FORMAT '/backup/oracle/level0_%U.bkp';
+
+
+# ============================================================
+# 5. Level 1 Incremental Backup
+# ============================================================
+
+# A level 1 incremental backup contains blocks changed since
+# the applicable parent incremental backup.
+
+BACKUP INCREMENTAL LEVEL 1 DATABASE
+FORMAT '/backup/oracle/level1_%U.bkp';
+
+
+# ============================================================
+# 6. Backup Control File and SPFILE
+# ============================================================
+
+BACKUP CURRENT CONTROLFILE
+FORMAT '/backup/oracle/controlfile_%U.bkp';
+
+BACKUP SPFILE
+FORMAT '/backup/oracle/spfile_%U.bkp';
+
+
+# ============================================================
+# 7. Validate Database Files
+# ============================================================
+
+# Validate database files without creating a backup set.
+
+BACKUP VALIDATE DATABASE;
+
+
+# ============================================================
+# 8. Validate Backup Availability
+# ============================================================
+
+# Check whether RMAN can restore the database from available
+# backups.
+
+RESTORE DATABASE VALIDATE;
+
+
+# ============================================================
+# 9. List Available Backups
+# ============================================================
+
+LIST BACKUP;
+
+
+# ============================================================
+# 10. Summary of Backup Strategy
+# ============================================================
+
+# Example strategy:
+#
+# Weekly:
+#   Level 0 database backup
+#
+# Daily:
+#   Level 1 incremental backup
+#
+# Frequently:
+#   Archived redo log backup
+#
+# Regularly:
+#   Backup validation
+#   Restore testing
+#   Backup monitoring
+#
+# The actual schedule should be based on RPO, RTO, database
+# workload, storage capacity and organizational requirements.
